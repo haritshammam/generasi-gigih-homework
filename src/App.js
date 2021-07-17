@@ -1,11 +1,14 @@
 import React from 'react'
 import Card from './components/cards'
-// import data from './single-sample'
 import datas from './datas/tracksData' 
 
 function App() {
   const valueAssignment = (dataParam) => {
-    let {name: trackTitle} = dataParam
+    let {
+      name: trackTitle,
+      id
+    } = dataParam
+
     let {
       name: albumName,
       artists: [
@@ -23,32 +26,41 @@ function App() {
     let trackDetails = {trackTitle, albumName, artistName}
 
     return {
+      id,
       albumImageUrl,
       trackDetails
     }
   }
 
-  const renderOneCard = () => {
-    datas.forEach((data, index) => {
-      let { albumImageUrl, trackDetails } = valueAssignment(data)
-      console.log(`${index+1}.`)
-      console.log(albumImageUrl)
-      console.log(trackDetails.trackTitle)
-      console.log(trackDetails.albumName)
-      console.log(trackDetails.artistName)
-      return (
-        <Card
-          trackDetails={trackDetails}
-          albumImageUrl={albumImageUrl}
-          buttonText="Select"
-        />
-      )
-    })
-  }
-
   return (
-    <div className="grid grid-cols-3 place-items-center gap-10 px-40">
-      {renderOneCard()}
+    <div className="bg-gray-50">
+      <div className="text-center pt-10">
+        <h1
+          className="text-3xl font-bold text-gray-900 mb-4"
+        >
+          Select music to add to your playlist
+        </h1>
+
+        <h2
+          className="text-md text-gray-400"
+        >
+          Showing {datas.length} result
+        </h2>
+      </div>
+
+      <div className="grid grid-cols-4 mt-8 px-10 gap-y-10 place-items-center">
+        {datas.map((data) => {
+          let { id, albumImageUrl, trackDetails } = valueAssignment(data)
+          return (
+            <Card
+              key = {id}
+              trackDetails={trackDetails}
+              albumImageUrl={albumImageUrl}
+              buttonText="Select"
+            />
+          )
+        })}
+      </div>
     </div>
   )
 }
