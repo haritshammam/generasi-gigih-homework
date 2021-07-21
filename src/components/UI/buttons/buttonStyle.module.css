@@ -1,0 +1,27 @@
+.button {
+    padding: 1rem 1.5rem;
+    background-color: #2DAFD8;
+    color: white;
+    border: 0;
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.button-medium {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+}
+
+.button-outline {
+    color: #2DAFD8;
+    border: 1px solid #2DAFD8; 
+    border-radius: 0.75rem;
+    font-size: 1rem;
+}
+
+.button:hover {
+    cursor: pointer;
+    background-color: #1C86A8;
+    transition: all 250ms;
+}
