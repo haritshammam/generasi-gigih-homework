@@ -11,6 +11,7 @@ function App() {
   const [accessToken, setAccessToken] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
+  const [isAuthenticated, setAuthenticated] = useState(false)
 
   const getParamsFromUrl = (hash) => {
     const stringAfterHashtag = hash.substring(1)
@@ -45,7 +46,6 @@ function App() {
       })
       .then((res) => {
         setTracksData(res.data.tracks.items)
-        console.log(tracksData)
       })
   }
 
@@ -54,26 +54,51 @@ function App() {
       const { access_token } = getParamsFromUrl(window.location.hash)
       setAccessToken(access_token)
     }
+    if (accessToken) {
+      setAuthenticated(true)
+    }
   }, [accessToken])
+
+  const handleKeywordSpace = (keyword) => {
+    const keywordString = keyword.replace(" ", "+")
+    return keywordString
+  }
+
+  const renderShowPage = () => {
+    if (isAuthenticated) {
+      let renderShowPage = (
+        <div>
+          <input type="text" placeholder="Seach playlist" onChange={(e) => setSearchKeyword(handleKeywordSpace(e.target.value))} />
+          {console.log(searchKeyword)}
+          <button onClick={handleSearchPlaylist}>Search</button>
+
+          {/* Buat state ketika tracksData masih kosong */}
+          {tracksData && tracksData.map((track, index) => {
+            return (
+              <div>
+                <img src={track.album.images[1].url} alt="Album" />
+                <p>{index + 1}. Track name: {track.name}</p>
+                <p>Artist name: {track.artists[0].name}</p>
+                <br />
+              </div>
+            )
+          })}
+        </div>
+      )
+      return renderShowPage
+    }
+  }
+
+  const renderAuthenticateButton = () => {
+    return (
+      isAuthenticated ? <h2>You are authenticated</h2> : <button onClick={handleLogin}>Connect with Spotify</button>
+    )
+  }
 
   return (
     <div>
-      <button onClick={handleLogin}>Connect with Spotify</button>
-      <br />
-      <br />
-      <input type="text" placeholder="Seach playlist" onChange={(e) => setSearchKeyword(e.target.value)} />
-      <button onClick={handleSearchPlaylist}>Search</button>
-
-      {/* Buat state ketika tracksData masih kosong */}
-      {tracksData.map((track, index) => {
-        return (
-          <div>
-            <p>{index+1}. Track name: {track.name}</p>
-            <p>Artist name: {track.artists[0].name}</p>
-            <br />
-          </div>
-        )
-      })}
+      {renderAuthenticateButton()}
+      {renderShowPage()}
     </div>
   )
 }
