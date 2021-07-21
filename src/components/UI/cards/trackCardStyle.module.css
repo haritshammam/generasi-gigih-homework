@@ -1,0 +1,62 @@
+.track_card_container {
+  background-color: #272b2c;
+  padding: 1rem 1rem 2rem;
+  border-radius: 1rem;
+}
+
+.track_card_container:hover {
+    background-color: #3d4344;
+    transition: all 0.25s;
+  }
+
+.track_image {
+  border-radius: 1.5rem;
+  max-width: 100%;
+}
+
+.track_name {
+  /* text-align: center; */
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.125rem;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track_artist {
+  font-size: 1rem;
+  color: #7e8d91;
+  margin-top: 0.5rem;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track_button {
+    margin-top: 1.5rem;
+    width: 100%;
+    background-color: #272b2c; ;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #2DAFD8;
+    border: 1px solid #3d4344; 
+    border-radius: 0.75rem;
+    font-size: 1rem;
+}
+
+.track_button:hover {
+    cursor: pointer;
+    background-color: #2DAFD8;
+    color: white;
+    border: 0;
+    transition: all 0.25s;
+}
+
+.track_button:active {
+    background-color: #1C86A8;
+}
