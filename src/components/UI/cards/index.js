@@ -9,6 +9,8 @@ const TrackCard = ({ albumImageUrl, trackName, artistName }) => {
         setTrackSelected(!isTrackSelected)
     }
 
+    
+
     return (
         <div className={styles.track_card_container}>
             <img src={albumImageUrl} alt="Album" className={styles.track_image}/>
@@ -18,7 +20,14 @@ const TrackCard = ({ albumImageUrl, trackName, artistName }) => {
             <p className={styles.track_artist}>
                 {artistName}
             </p>
-            <button className={styles.track_button} onClick={handleSelectTrack}>{isTrackSelected ? "Deselect" : "Select"}</button>
+            <button 
+                className={
+                    isTrackSelected ? `${styles.track_button} ${styles.track_button_selected}` : `${styles.track_button}`
+                } 
+                onClick={handleSelectTrack}
+            >
+                {isTrackSelected ? "Deselect" : "Select"}
+            </button>
         </div>
     )
 }

@@ -60,3 +60,17 @@
 .track_button:active {
     background-color: #1C86A8;
 }
+
+.track_button_selected {
+    background-color: #2DAFD8;
+    color: white;
+    border: none;
+}
+
+.track_button_selected:hover {
+  background-color: #1C86A8;
+}
+
+.track_button_selected:active {
+  background-color: #1a6b86;
+}
