@@ -13,7 +13,6 @@ function App() {
   const [accessToken, setAccessToken] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
-  const [isAuthenticated, setAuthenticated] = useState(false)
 
   // To get URL hash that contains tokens info
   const getParamsFromUrl = (hash) => {
@@ -74,7 +73,7 @@ function App() {
 
   // To show search tracks components
   const renderShowTracksPage = () => {
-    if (isAuthenticated) {
+    if (accessToken) {
       let renderShowPage = (
         <div>
           <div className={styles.search_container}>
@@ -85,17 +84,17 @@ function App() {
             />
 
             <div className={styles.search_button}>
-              <IconButton onClick={handleSearchPlaylist}><i class="fas fa-search"></i></IconButton>
+              <IconButton onClick={handleSearchPlaylist}><i className="fas fa-search"></i></IconButton>
             </div>
           </div>
 
           {tracksData && <p className={styles.text_small}>Showing {tracksData.length} result</p>}
 
           <div className={styles.track_card_list_container}>
-            {tracksData && tracksData.map((track, index) => {
+            {tracksData && tracksData.map((track) => {
               return (
                 <TrackCard
-                  key={track.id}
+                  key={track.uri}
                   albumImageUrl={track.album.images[1].url}
                   trackName={track.name}
                   artistName={track.artists[0].name}
@@ -111,7 +110,7 @@ function App() {
 
   // To show authenticate button if not authenticated yet
   const renderAuthenticateButton = () => {
-    if (isAuthenticated) {
+    if (accessToken) {
       return (
         <div className={styles.authentication_container}>
           <h2 className={styles.authentication_heading}>You are authenticated</h2>
@@ -129,13 +128,12 @@ function App() {
 
   }
 
+  // 1. To set the access token from URL into accessToken state 
+  // 2. To set the authenticated state to true if accessToken is given
   useEffect(() => {
     if (window.location.hash) {
       const { access_token } = getParamsFromUrl(window.location.hash)
       setAccessToken(access_token)
-    }
-    if (accessToken) {
-      setAuthenticated(true)
     }
   }, [accessToken])
 
