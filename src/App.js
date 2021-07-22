@@ -13,7 +13,6 @@ function App() {
   const [accessToken, setAccessToken] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
-  const [isTrackSelected, setTracksState] = useState(false)
 
   // To get URL hash that contains tokens info
   const getParamsFromUrl = (hash) => {
@@ -92,14 +91,13 @@ function App() {
           {tracksData && <p className={styles.text_small}>Showing {tracksData.length} result</p>}
 
           <div className={styles.track_card_list_container}>
-            {tracksData && tracksData.map((track, index) => {
+            {tracksData && tracksData.map((track) => {
               return (
                 <TrackCard
                   key={track.uri}
                   albumImageUrl={track.album.images[1].url}
                   trackName={track.name}
                   artistName={track.artists[0].name}
-                  buttonState={[isTrackSelected, setTracksState]}
                 />
               )
             })}

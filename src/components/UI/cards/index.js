@@ -1,9 +1,9 @@
-import React from 'react'
+import React, {useState} from 'react'
 import styles from './trackCardStyle.module.css'
 
-const TrackCard = ({ albumImageUrl, trackName, artistName, buttonState }) => {
+const TrackCard = ({ albumImageUrl, trackName, artistName }) => {
 
-    const [isTrackSelected, setTrackSelected] = buttonState
+    const [isTrackSelected, setTrackSelected] = useState(false)
     
     const handleSelectTrack = () => {
         setTrackSelected(!isTrackSelected)
