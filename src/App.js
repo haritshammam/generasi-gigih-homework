@@ -8,11 +8,20 @@ import Button from './components/UI/buttons'
 import InputLarge from './components/UI/input-field-large'
 import TrackCard from './components/UI/cards'
 import IconButton from './components/UI/icon-buttons'
+import NewPlaylistForm from './components/UI/forms'
+import UserProfile from './components/UI/user-profile'
 
 function App() {
   const [accessToken, setAccessToken] = useState()
+  const [userData, setUserData] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
+  const [selectedTracks, setSelectedTracks] = useState([])
+  const [myPlaylistData, setMyPlaylistData] = useState([])
+  const [newPlaylistForm, setnewPlaylistForm] = useState({
+    playlistTitle: '',
+    playlistDescription: ''
+  })
 
   // To get URL hash that contains tokens info
   const getParamsFromUrl = (hash) => {
@@ -33,7 +42,7 @@ function App() {
   }
 
   // To call Spotify Search API
-  const handleSearchPlaylist = async () => {
+  const handleSearchTracks = async () => {
     await axios
       .get("https://api.spotify.com/v1/search", {
         headers: {
@@ -53,29 +62,110 @@ function App() {
       })
   }
 
-  // To replace space with + in search query
-  const handleKeywordSpace = (keyword) => {
-    const keywordString = keyword.replace(" ", "+")
-    return keywordString
+  // To call Spotify Get User Profile Data API
+  const handleGetUserProfile = async () => {
+    await axios({
+      method: 'get',
+      url: 'https://api.spotify.com/v1/me',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => {
+        setUserData(res.data)
+      })
   }
 
-  // To set search keyword from search input text
-  const handleSetSearchKeyword = (e) => {
-    setSearchKeyword(handleKeywordSpace(e.target.value))
+  // To call Spotify Add tracks to the playlist API
+  const handleAppendTracksToPlaylist = (playlist_id) => {
+    axios({
+      method: 'post',
+      url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
+      data: {
+        uris: selectedTracks
+      },
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      }
+    })
   }
 
-  // To trigger call handleSearchPlaylist using enter from search input text
-  const handleEnterSearchPlaylist = (e) => {
-    if (e.keyCode === 13) {
-      handleSearchPlaylist()
+  // To call Spotify Create New Playlist API
+  const handleCreatePlaylist = async () => {
+    try {
+      const response = await axios({
+        method: 'post',
+        url: `https://api.spotify.com/v1/users/haritshammam/playlists`,
+        data: {
+          name: newPlaylistForm.playlistTitle,
+          description: newPlaylistForm.playlistDescription,
+          public: false,
+          collaborative: false
+        },
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      })
+      const data = response.data
+      setMyPlaylistData(data)
+      handleAppendTracksToPlaylist(myPlaylistData.id)
+    }
+    catch (error) {
+      console.error(error)
     }
   }
 
-  // To show search tracks components
+  // To handle submit new playlist form
+  const handleSubmitNewPlaylistForm = e => {
+    e.preventDefault()
+    handleCreatePlaylist()
+  }
+
+  // To handle input change of New Playlist form
+  const handleChangeNewPlaylistInput = e => {
+    setnewPlaylistForm({ ...newPlaylistForm, [e.target.name]: e.target.value })
+  }
+
+  // To set search keyword from search input text
+  const handleSetSearchKeyword = e => {
+    setSearchKeyword(e.target.value.replace(" ", "+"))
+  }
+
+  // To trigger call handleSearchPlaylist using enter from search input text
+  const handleEnterSearchPlaylist = e => {
+    if (e.keyCode === 13) {
+      handleSearchTracks()
+    }
+  }
+
+  // AAAAAAAAAAAAAAAAAAAAAA
+  const addSelectedTrackToList = (uri) => {
+    const selectedItem = uri
+    setSelectedTracks([...selectedTracks, selectedItem])
+  }
+
+
+
+  // To show main menu components
   const renderShowTracksPage = () => {
     if (accessToken) {
       let renderShowPage = (
         <div>
+          <div>
+            {showUserProfile()}
+          </div>
+          <NewPlaylistForm
+            handleSubmitNewPlaylistForm={handleSubmitNewPlaylistForm}
+            handleChangeNewPlaylistInput={handleChangeNewPlaylistInput}
+            newPlaylistForm={newPlaylistForm}
+          />
+
           <div className={styles.search_container}>
             <InputLarge
               onChange={handleSetSearchKeyword}
@@ -84,7 +174,7 @@ function App() {
             />
 
             <div className={styles.search_button}>
-              <IconButton onClick={handleSearchPlaylist}><i className="fas fa-search"></i></IconButton>
+              <IconButton onClick={handleSearchTracks}><i className="fas fa-search"></i></IconButton>
             </div>
           </div>
 
@@ -94,9 +184,9 @@ function App() {
             {tracksData && tracksData.map((track) => {
               return (
                 <TrackCard
-                  key={track.uri}
-                  albumImageUrl={track.album.images[1].url}
-                  trackName={track.name}
+                  key={track.id}
+                  trackData={track}
+                  selectTrackMethod={addSelectedTrackToList}
                   artistName={track.artists[0].name}
                 />
               )
@@ -108,16 +198,13 @@ function App() {
     }
   }
 
+  const showUserProfile = () => {
+    return userData ? <UserProfile userData={userData} /> : null
+  }
+
   // To show authenticate button if not authenticated yet
   const renderAuthenticateButton = () => {
-    if (accessToken) {
-      return (
-        <div className={styles.authentication_container}>
-          <h2 className={styles.authentication_heading}>You are authenticated</h2>
-        </div>
-      )
-    }
-    else {
+    if (!accessToken) {
       return (
         <div className={styles.authentication_container}>
           <h2 className={styles.authentication_heading}>You are not authenticated yet</h2>
@@ -134,6 +221,9 @@ function App() {
     if (window.location.hash) {
       const { access_token } = getParamsFromUrl(window.location.hash)
       setAccessToken(access_token)
+    }
+    if (accessToken) {
+      handleGetUserProfile()
     }
   }, [accessToken])
 

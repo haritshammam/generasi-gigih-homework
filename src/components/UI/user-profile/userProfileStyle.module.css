@@ -1,0 +1,29 @@
+.container {
+  --tw-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
+    var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+  width: 10rem;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.container:hover {
+    background-color: #242b31;
+    transition: all 0.25s;
+}
+
+.display_picture {
+  border-radius: 100%;
+  width: 5rem;
+  margin-bottom: 0.5rem;
+}
+
+.display_name {
+  font-size: 1rem;
+  color: #2dafd8;
+}

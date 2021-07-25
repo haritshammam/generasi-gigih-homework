@@ -1,24 +1,24 @@
 import React, {useState} from 'react'
 import styles from './trackCardStyle.module.css'
 
-const TrackCard = ({ albumImageUrl, trackName, artistName }) => {
-
+const TrackCard = ({  trackData, selectTrackMethod }) => {
     const [isTrackSelected, setTrackSelected] = useState(false)
     
     const handleSelectTrack = () => {
         setTrackSelected(!isTrackSelected)
+        selectTrackMethod(trackData.uri)
     }
 
     
 
     return (
         <div className={styles.track_card_container}>
-            <img src={albumImageUrl} alt="Album" className={styles.track_image}/>
+            <img src={trackData.album.images[1].url} alt="Album" className={styles.track_image}/>
             <p className={styles.track_name}>
-                {trackName}
+                {trackData.name}
             </p>
             <p className={styles.track_artist}>
-                {artistName}
+                {trackData.artists[0].name}
             </p>
             <button 
                 className={
