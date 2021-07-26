@@ -16,8 +16,11 @@ function App() {
   const [userData, setUserData] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
+  const [isTrackSelected, setTrackSelected] = useState(false)
+
   const [selectedTracks, setSelectedTracks] = useState([])
-  const [myPlaylistData, setMyPlaylistData] = useState([])
+
+  const [myPlaylistData, setMyPlaylistData] = useState()
   const [newPlaylistForm, setnewPlaylistForm] = useState({
     playlistTitle: '',
     playlistDescription: ''
@@ -64,34 +67,42 @@ function App() {
 
   // To call Spotify Get User Profile Data API
   const handleGetUserProfile = async () => {
-    await axios({
-      method: 'get',
-      url: 'https://api.spotify.com/v1/me',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => {
-        setUserData(res.data)
+    try {
+      const res = await axios({
+        method: 'get',
+        url: 'https://api.spotify.com/v1/me',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
       })
+      setUserData(res.data)
+    }
+    catch (err) {
+      console.error(err)
+    }
   }
 
   // To call Spotify Add tracks to the playlist API
-  const handleAppendTracksToPlaylist = (playlist_id) => {
-    axios({
-      method: 'post',
-      url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
-      data: {
-        uris: selectedTracks
-      },
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      }
-    })
+  const handleAppendTracksToPlaylist = async (playlist_id) => {
+    try {
+      await axios({
+        method: 'post',
+        url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
+        data: {
+          uris: selectedTracks
+        },
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      })
+    }
+    catch (err) {
+      console.error(err)
+    }
   }
 
   // To call Spotify Create New Playlist API
@@ -112,8 +123,7 @@ function App() {
           "Content-Type": "application/json"
         }
       })
-      const data = response.data
-      setMyPlaylistData(data)
+      setMyPlaylistData(response.data)
       handleAppendTracksToPlaylist(myPlaylistData.id)
     }
     catch (error) {
@@ -150,6 +160,34 @@ function App() {
     setSelectedTracks([...selectedTracks, selectedItem])
   }
 
+  // ==================================================
+  // To get select track button state
+  const getSelectTrackButtonState = (uri) => {
+    let status = false;
+    for (let i = 0; i < selectedTracks.length; i++) {
+      if (selectedTracks[i] === uri) {
+        status = true
+      }
+    }
+    return status;
+  }
+
+  const pushToSelectedTracks = (uri) => {
+    const currentList = selectedTracks;
+    currentList.push(uri);
+    setSelectedTracks(currentList);
+  }
+
+  const deleteFromSelectedTracks = (uri) => {
+    const currentList = selectedTracks;
+    for (var i = 0; i < selectedTracks.length; i++) {
+      if (selectedTracks[i] === uri) {
+        currentList.splice(i, 1);
+      }
+    }
+    setSelectedTracks(currentList);
+  }
+  // ==================================================
 
 
   // To show main menu components
@@ -182,12 +220,15 @@ function App() {
 
           <div className={styles.track_card_list_container}>
             {tracksData && tracksData.map((track) => {
+              const buttonState = getSelectTrackButtonState(track.uri)
               return (
                 <TrackCard
                   key={track.id}
                   trackData={track}
-                  selectTrackMethod={addSelectedTrackToList}
-                  artistName={track.artists[0].name}
+                  buttonState={buttonState}
+                  isTrackSelected={isTrackSelected}
+                  pushToSelectedTracks={pushToSelectedTracks}
+                  deleteFromSelectedTracks={deleteFromSelectedTracks}
                 />
               )
             })}
