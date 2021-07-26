@@ -1,33 +1,43 @@
 import React, {useState} from 'react'
 import styles from './trackCardStyle.module.css'
+import Button from '../buttons/index'
 
-const TrackCard = ({ albumImageUrl, trackName, artistName }) => {
-
-    const [isTrackSelected, setTrackSelected] = useState(false)
+const TrackCard = ({  buttonState, trackData, isTrackSelected, pushToSelectedTracks, deleteFromSelectedTracks }) => {
     
+    const [isTrackSelected2, setTrackSelected] = useState(buttonState)
+    
+    // const handleSelectTrack = () => {
+    //     setTrackSelected(!isTrackSelected)
+    //     selectTrackMethod(trackData.uri)
+    // }
+
     const handleSelectTrack = () => {
-        setTrackSelected(!isTrackSelected)
+        setTrackSelected(!isTrackSelected2)
+        if (!isTrackSelected2) {
+            pushToSelectedTracks(trackData.uri)
+        }
+        else {
+            deleteFromSelectedTracks(trackData.uri)
+        }
     }
-
     
+    let SelectButton
+    if (!isTrackSelected2){
+        SelectButton = <Button className={styles.track_button} onClick={handleSelectTrack}>Select</Button>
+    } else {
+        SelectButton = <Button className={`${styles.track_button} ${styles.track_button_selected}`} onClick={handleSelectTrack}>Deselect</Button>
+    }
 
     return (
         <div className={styles.track_card_container}>
-            <img src={albumImageUrl} alt="Album" className={styles.track_image}/>
+            <img src={trackData.album.images[1].url} alt="Album" className={styles.track_image}/>
             <p className={styles.track_name}>
-                {trackName}
+                {trackData.name}
             </p>
             <p className={styles.track_artist}>
-                {artistName}
+                {trackData.artists[0].name}
             </p>
-            <button 
-                className={
-                    isTrackSelected ? `${styles.track_button} ${styles.track_button_selected}` : `${styles.track_button}`
-                } 
-                onClick={handleSelectTrack}
-            >
-                {isTrackSelected ? "Deselect" : "Select"}
-            </button>
+            {SelectButton}
         </div>
     )
 }
