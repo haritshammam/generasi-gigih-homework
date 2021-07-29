@@ -16,10 +16,7 @@ function App() {
   const [userData, setUserData] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
-  const [isTrackSelected, setTrackSelected] = useState(false)
-
   const [selectedTracks, setSelectedTracks] = useState([])
-
   const [myPlaylistData, setMyPlaylistData] = useState()
   const [newPlaylistForm, setnewPlaylistForm] = useState({
     playlistTitle: '',
@@ -28,8 +25,7 @@ function App() {
 
   // To get URL hash that contains tokens info
   const getParamsFromUrl = (hash) => {
-    const stringAfterHashtag = hash.substring(1)
-    const paramsInUrl = stringAfterHashtag.split("&")
+    const paramsInUrl = hash.substring(1).split("&")
     const paramsSplitUp = paramsInUrl.reduce((acc, currentVal) => {
       const [key, value] = currentVal.split("=")
       acc[key] = value
@@ -46,8 +42,10 @@ function App() {
 
   // To call Spotify Search API
   const handleSearchTracks = async () => {
-    await axios
-      .get("https://api.spotify.com/v1/search", {
+    try {
+      const res = await axios({
+        method: "get",
+        url: "https://api.spotify.com/v1/search",
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           "Accept": "application/json",
@@ -58,11 +56,13 @@ function App() {
           q: searchKeyword,
           type: "track",
           limit: 12
-        },
+        }
       })
-      .then((res) => {
-        setTracksData(res.data.tracks.items)
-      })
+      setTracksData(res.data.tracks.items)
+    }
+    catch (err) {
+      console.error(err)
+    }
   }
 
   // To call Spotify Get User Profile Data API
@@ -124,7 +124,7 @@ function App() {
         }
       })
       setMyPlaylistData(response.data)
-      handleAppendTracksToPlaylist(myPlaylistData.id)
+      // handleAppendTracksToPlaylist(myPlaylistData.id)
     }
     catch (error) {
       console.error(error)
@@ -142,22 +142,11 @@ function App() {
     setnewPlaylistForm({ ...newPlaylistForm, [e.target.name]: e.target.value })
   }
 
-  // To set search keyword from search input text
-  const handleSetSearchKeyword = e => {
-    setSearchKeyword(e.target.value.replace(" ", "+"))
-  }
-
   // To trigger call handleSearchPlaylist using enter from search input text
   const handleEnterSearchPlaylist = e => {
     if (e.keyCode === 13) {
       handleSearchTracks()
     }
-  }
-
-  // AAAAAAAAAAAAAAAAAAAAAA
-  const addSelectedTrackToList = (uri) => {
-    const selectedItem = uri
-    setSelectedTracks([...selectedTracks, selectedItem])
   }
 
   // ==================================================
@@ -206,7 +195,7 @@ function App() {
 
           <div className={styles.search_container}>
             <InputLarge
-              onChange={handleSetSearchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value.replace(" ", "+"))}
               onKeyDown={handleEnterSearchPlaylist}
               placeholder="Search tracks"
             />
@@ -226,7 +215,6 @@ function App() {
                   key={track.id}
                   trackData={track}
                   buttonState={buttonState}
-                  isTrackSelected={isTrackSelected}
                   pushToSelectedTracks={pushToSelectedTracks}
                   deleteFromSelectedTracks={deleteFromSelectedTracks}
                 />
@@ -266,7 +254,10 @@ function App() {
     if (accessToken) {
       handleGetUserProfile()
     }
-  }, [accessToken])
+    if (myPlaylistData) {
+      handleAppendTracksToPlaylist(myPlaylistData.id)
+    }
+  }, [accessToken, myPlaylistData])
 
   return (
     <div className={styles.app_container}>
