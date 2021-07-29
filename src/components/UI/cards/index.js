@@ -2,14 +2,9 @@ import React, {useState} from 'react'
 import styles from './trackCardStyle.module.css'
 import Button from '../buttons/index'
 
-const TrackCard = ({  buttonState, trackData, isTrackSelected, pushToSelectedTracks, deleteFromSelectedTracks }) => {
+const TrackCard = ({  buttonState, trackData, pushToSelectedTracks, deleteFromSelectedTracks }) => {
     
     const [isTrackSelected2, setTrackSelected] = useState(buttonState)
-    
-    // const handleSelectTrack = () => {
-    //     setTrackSelected(!isTrackSelected)
-    //     selectTrackMethod(trackData.uri)
-    // }
 
     const handleSelectTrack = () => {
         setTrackSelected(!isTrackSelected2)
