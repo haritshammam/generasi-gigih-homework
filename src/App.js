@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from 'react-router-dom';
 
 import { CLIENT_ID, SPOTIFY_AUTHORIZE_ENDPOINT, REDIRECT_URL_AFTER_LOGIN, SCOPE } from './constants/spotifyAuthConst'
 import { tokenActions } from './redux/slices/token-slice'
@@ -198,57 +204,69 @@ function App() {
   }, [accessToken, myPlaylistData])
 
   return (
-    <div className={styles.app_container}>
-      {accessToken &&
-        <div>
-          <div>
-            {userData && <UserProfile userData={userData} />}
-          </div>
+    <Router>
+      <div className={styles.app_container}>
+        <Switch>
+          <Route path="/create-playlist">
+            <div>
+              <div>
+                {userData && <UserProfile userData={userData} />}
+              </div>
 
-          <NewPlaylistForm
-            handleSubmitNewPlaylistForm={handleSubmitNewPlaylistForm}
-            handleChangeNewPlaylistInput={handleChangeNewPlaylistInput}
-            newPlaylistForm={newPlaylistForm}
-          />
+              <NewPlaylistForm
+                handleSubmitNewPlaylistForm={handleSubmitNewPlaylistForm}
+                handleChangeNewPlaylistInput={handleChangeNewPlaylistInput}
+                newPlaylistForm={newPlaylistForm}
+              />
 
-          <div className={styles.search_container}>
-            <InputLarge
-              onChange={(e) => setSearchKeyword(e.target.value.replace(" ", "+"))}
-              onKeyDown={handleEnterSearchPlaylist}
-              placeholder="Search tracks"
-            />
-
-            <div className={styles.search_button}>
-              <IconButton onClick={handleSearchTracks}><i className="fas fa-search"></i></IconButton>
-            </div>
-          </div>
-
-          {tracksData && <p className={styles.text_small}>Showing {tracksData.length} result</p>}
-
-          <div className={styles.track_card_list_container}>
-            {tracksData && tracksData.map((track) => {
-              const buttonState = getSelectTrackButtonState(track.uri)
-              return (
-                <TrackCard
-                  key={track.id}
-                  trackData={track}
-                  buttonState={buttonState}
-                  pushToSelectedTracks={pushToSelectedTracks}
-                  deleteFromSelectedTracks={deleteFromSelectedTracks}
+              <div className={styles.search_container}>
+                <InputLarge
+                  onChange={(e) => setSearchKeyword(e.target.value.replace(" ", "+"))}
+                  onKeyDown={handleEnterSearchPlaylist}
+                  placeholder="Search tracks"
                 />
-              )
-            })}
-          </div>
-        </div>
-      }
 
-      {!accessToken &&
-        <div className={styles.authentication_container}>
-          <h2 className={styles.authentication_heading}>You are not authenticated yet</h2>
-          <Button onClick={handleLogin}>Authenticate Spotify</Button>
-        </div>
-      }
-    </div>
+                <div className={styles.search_button}>
+                  <IconButton onClick={handleSearchTracks}><i className="fas fa-search"></i></IconButton>
+                </div>
+              </div>
+
+              {tracksData && <p className={styles.text_small}>Showing {tracksData.length} result</p>}
+
+              <div className={styles.track_card_list_container}>
+                {tracksData && tracksData.map((track) => {
+                  const buttonState = getSelectTrackButtonState(track.uri)
+                  return (
+                    <TrackCard
+                      key={track.id}
+                      trackData={track}
+                      buttonState={buttonState}
+                      pushToSelectedTracks={pushToSelectedTracks}
+                      deleteFromSelectedTracks={deleteFromSelectedTracks}
+                    />
+                  )
+                })}
+              </div>
+            </div>
+
+            {!accessToken && (
+              <Redirect to="/" exact />
+            )}
+          </Route>
+
+          <Route path="/" exact>
+            {accessToken && (
+              <Redirect to="/create-playlist" />
+            )}
+
+            <div className={styles.authentication_container}>
+              <h2 className={styles.authentication_heading}>You are not authenticated yet</h2>
+              <Button onClick={handleLogin}>Authenticate Spotify</Button>
+            </div>
+          </Route>
+        </Switch>
+      </div>
+    </Router>
   )
 }
 
