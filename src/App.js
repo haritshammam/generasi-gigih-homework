@@ -1,7 +1,9 @@
-
 import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import axios from 'axios'
+
 import { CLIENT_ID, SPOTIFY_AUTHORIZE_ENDPOINT, REDIRECT_URL_AFTER_LOGIN, SCOPE } from './constants/spotifyAuthConst'
+import { tokenActions } from './redux/slices/token-slice'
 
 import styles from './App.module.css'
 import Button from './components/UI/buttons'
@@ -12,7 +14,9 @@ import NewPlaylistForm from './components/UI/forms'
 import UserProfile from './components/UI/user-profile'
 
 function App() {
-  const [accessToken, setAccessToken] = useState()
+  const accessToken = useSelector(state => state.token.token)
+  const dispatch = useDispatch()
+
   const [userData, setUserData] = useState()
   const [searchKeyword, setSearchKeyword] = useState()
   const [tracksData, setTracksData] = useState()
@@ -23,7 +27,12 @@ function App() {
     playlistDescription: ''
   })
 
-  // To get URL hash that contains tokens info
+  // To go to spotify authentication page
+  const handleLogin = () => {
+    window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPE}&response_type=token&state=123`
+  }
+
+  // To get params from URL after login to Spotify
   const getParamsFromUrl = (hash) => {
     const paramsInUrl = hash.substring(1).split("&")
     const paramsSplitUp = paramsInUrl.reduce((acc, currentVal) => {
@@ -33,11 +42,6 @@ function App() {
     }, {})
 
     return paramsSplitUp
-  }
-
-  // To go to spotify authentication page
-  const handleLogin = () => {
-    window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPE}&response_type=token&state=123`
   }
 
   // To call Spotify Search API
@@ -178,15 +182,29 @@ function App() {
   }
   // ==================================================
 
-
-  // To show main menu components
-  const renderShowTracksPage = () => {
+  // 1. To set the access token from URL into accessToken state 
+  // 2. To set the authenticated state to true if accessToken is given
+  useEffect(() => {
+    if (window.location.hash) {
+      const { access_token } = getParamsFromUrl(window.location.hash)
+      dispatch(tokenActions.getToken(access_token))
+    }
     if (accessToken) {
-      let renderShowPage = (
+      handleGetUserProfile()
+    }
+    if (myPlaylistData) {
+      handleAppendTracksToPlaylist(myPlaylistData.id)
+    }
+  }, [accessToken, myPlaylistData])
+
+  return (
+    <div className={styles.app_container}>
+      {accessToken &&
         <div>
           <div>
-            {showUserProfile()}
+            {userData && <UserProfile userData={userData} />}
           </div>
+
           <NewPlaylistForm
             handleSubmitNewPlaylistForm={handleSubmitNewPlaylistForm}
             handleChangeNewPlaylistInput={handleChangeNewPlaylistInput}
@@ -222,47 +240,14 @@ function App() {
             })}
           </div>
         </div>
-      )
-      return renderShowPage
-    }
-  }
+      }
 
-  const showUserProfile = () => {
-    return userData ? <UserProfile userData={userData} /> : null
-  }
-
-  // To show authenticate button if not authenticated yet
-  const renderAuthenticateButton = () => {
-    if (!accessToken) {
-      return (
+      {!accessToken &&
         <div className={styles.authentication_container}>
           <h2 className={styles.authentication_heading}>You are not authenticated yet</h2>
           <Button onClick={handleLogin}>Authenticate Spotify</Button>
         </div>
-      )
-    }
-
-  }
-
-  // 1. To set the access token from URL into accessToken state 
-  // 2. To set the authenticated state to true if accessToken is given
-  useEffect(() => {
-    if (window.location.hash) {
-      const { access_token } = getParamsFromUrl(window.location.hash)
-      setAccessToken(access_token)
-    }
-    if (accessToken) {
-      handleGetUserProfile()
-    }
-    if (myPlaylistData) {
-      handleAppendTracksToPlaylist(myPlaylistData.id)
-    }
-  }, [accessToken, myPlaylistData])
-
-  return (
-    <div className={styles.app_container}>
-      {renderAuthenticateButton()}
-      {renderShowTracksPage()}
+      }
     </div>
   )
 }
