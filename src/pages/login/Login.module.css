@@ -1,0 +1,13 @@
+.app_container {
+	padding: 5rem 3rem 7rem;
+}
+
+.authentication_container {
+  text-align: center;
+}
+
+.authentication_heading {
+  font-size: 2.5rem;
+  color: #2dafd8;
+  margin-bottom: 4rem;
+}

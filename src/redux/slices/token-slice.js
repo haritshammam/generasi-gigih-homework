@@ -10,6 +10,9 @@ const tokenSlice = createSlice({
     reducers: {
         getToken(state, action) {
             state.token = action.payload
+        },
+        emptyToken(state) {
+            state.token = null
         }
     }
 })
