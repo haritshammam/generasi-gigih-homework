@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import axios from 'axios'
 import {
   BrowserRouter as Router,
   Switch,
@@ -10,6 +9,7 @@ import {
 
 import { CLIENT_ID, SPOTIFY_AUTHORIZE_ENDPOINT, REDIRECT_URL_AFTER_LOGIN, SCOPE } from './constants/spotifyAuthConst'
 import { tokenActions } from './redux/slices/token-slice'
+import { createPlaylist, searchTrack, getUserProfile } from './redux/slices/spotify-slice';
 
 import styles from './App.module.css'
 import Button from './components/UI/buttons'
@@ -20,14 +20,14 @@ import NewPlaylistForm from './components/UI/forms'
 import UserProfile from './components/UI/user-profile'
 
 function App() {
-  const accessToken = useSelector(state => state.token.token)
   const dispatch = useDispatch()
 
-  const [userData, setUserData] = useState()
+  const accessToken = useSelector(state => state.token.token)
+  const tracksData = useSelector(state => state.spotify.tracksData)
+  const userData = useSelector(state => state.spotify.userData)
+
   const [searchKeyword, setSearchKeyword] = useState()
-  const [tracksData, setTracksData] = useState()
   const [selectedTracks, setSelectedTracks] = useState([])
-  const [myPlaylistData, setMyPlaylistData] = useState()
   const [newPlaylistForm, setnewPlaylistForm] = useState({
     playlistTitle: '',
     playlistDescription: ''
@@ -36,6 +36,10 @@ function App() {
   // To go to spotify authentication page
   const handleLogin = () => {
     window.location = `${SPOTIFY_AUTHORIZE_ENDPOINT}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URL_AFTER_LOGIN}&scope=${SCOPE}&response_type=token&state=123`
+  }
+
+  const handleLogout = () => {
+    dispatch(tokenActions.emptyToken())
   }
 
   // To get params from URL after login to Spotify
@@ -51,112 +55,24 @@ function App() {
   }
 
   // To call Spotify Search API
-  const handleSearchTracks = async () => {
-    try {
-      const res = await axios({
-        method: "get",
-        url: "https://api.spotify.com/v1/search",
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-        },
-        params: {
-          api_key: process.env.REACT_APP_GIPHY_API_KEY,
-          q: searchKeyword,
-          type: "track",
-          limit: 12
-        }
-      })
-      setTracksData(res.data.tracks.items)
-    }
-    catch (err) {
-      console.error(err)
-    }
+  const handleSearchTracks = () => {
+    dispatch(searchTrack(accessToken, searchKeyword))
   }
 
   // To call Spotify Get User Profile Data API
-  const handleGetUserProfile = async () => {
-    try {
-      const res = await axios({
-        method: 'get',
-        url: 'https://api.spotify.com/v1/me',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      setUserData(res.data)
-    }
-    catch (err) {
-      console.error(err)
-    }
-  }
-
-  // To call Spotify Add tracks to the playlist API
-  const handleAppendTracksToPlaylist = async (playlist_id) => {
-    try {
-      await axios({
-        method: 'post',
-        url: `https://api.spotify.com/v1/playlists/${playlist_id}/tracks`,
-        data: {
-          uris: selectedTracks
-        },
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-    }
-    catch (err) {
-      console.error(err)
-    }
-  }
-
-  // To call Spotify Create New Playlist API
-  const handleCreatePlaylist = async () => {
-    try {
-      const response = await axios({
-        method: 'post',
-        url: `https://api.spotify.com/v1/users/haritshammam/playlists`,
-        data: {
-          name: newPlaylistForm.playlistTitle,
-          description: newPlaylistForm.playlistDescription,
-          public: false,
-          collaborative: false
-        },
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      setMyPlaylistData(response.data)
-      // handleAppendTracksToPlaylist(myPlaylistData.id)
-    }
-    catch (error) {
-      console.error(error)
-    }
+  const handleGetUserProfile = () => {
+    dispatch(getUserProfile(accessToken))
   }
 
   // To handle submit new playlist form
   const handleSubmitNewPlaylistForm = e => {
     e.preventDefault()
-    handleCreatePlaylist()
+    dispatch(createPlaylist(newPlaylistForm, accessToken, selectedTracks))
   }
 
   // To handle input change of New Playlist form
   const handleChangeNewPlaylistInput = e => {
     setnewPlaylistForm({ ...newPlaylistForm, [e.target.name]: e.target.value })
-  }
-
-  // To trigger call handleSearchPlaylist using enter from search input text
-  const handleEnterSearchPlaylist = e => {
-    if (e.keyCode === 13) {
-      handleSearchTracks()
-    }
   }
 
   // ==================================================
@@ -198,19 +114,32 @@ function App() {
     if (accessToken) {
       handleGetUserProfile()
     }
-    if (myPlaylistData) {
-      handleAppendTracksToPlaylist(myPlaylistData.id)
-    }
-  }, [accessToken, myPlaylistData])
+  }, [accessToken, dispatch])
 
   return (
     <Router>
       <div className={styles.app_container}>
         <Switch>
+          <Route path="/" exact>
+            {accessToken && (
+              <Redirect to="/create-playlist" />
+            )}
+
+            <div className={styles.authentication_container}>
+              <h2 className={styles.authentication_heading}>You are not authenticated yet</h2>
+              <Button onClick={handleLogin}>Authenticate Spotify</Button>
+            </div>
+          </Route>
+
           <Route path="/create-playlist">
             <div>
               <div>
-                {userData && <UserProfile userData={userData} />}
+                {userData && (
+                  <div>
+                    <UserProfile userData={userData} />
+                    <Button onClick={handleLogout}>Logout</Button>
+                  </div>
+                )}
               </div>
 
               <NewPlaylistForm
@@ -222,7 +151,6 @@ function App() {
               <div className={styles.search_container}>
                 <InputLarge
                   onChange={(e) => setSearchKeyword(e.target.value.replace(" ", "+"))}
-                  onKeyDown={handleEnterSearchPlaylist}
                   placeholder="Search tracks"
                 />
 
@@ -254,16 +182,6 @@ function App() {
             )}
           </Route>
 
-          <Route path="/" exact>
-            {accessToken && (
-              <Redirect to="/create-playlist" />
-            )}
-
-            <div className={styles.authentication_container}>
-              <h2 className={styles.authentication_heading}>You are not authenticated yet</h2>
-              <Button onClick={handleLogin}>Authenticate Spotify</Button>
-            </div>
-          </Route>
         </Switch>
       </div>
     </Router>
