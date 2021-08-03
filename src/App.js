@@ -13,6 +13,7 @@ import { tokenActions } from './redux/slices/token-slice';
 import './App.module.css'
 import Login from './pages/login/Login';
 import CreatePlaylist from './pages/create-playlist/CreatePlaylist';
+import Navbar from './components/navbar';
 
 function App() {
   const accessToken = useSelector(state => state.token.token)
@@ -42,21 +43,22 @@ function App() {
 
   return (
     <Router>
-        <Switch>
-          <Route path="/" exact>
-            {accessToken && (
-              <Redirect to="/create-playlist" />
-            )}
-            <Login />
-          </Route>
+      <Navbar/>
+      <Switch>
+        <Route path="/create-playlist">
+          <CreatePlaylist />
+          {!accessToken && (
+            <Redirect to="/" exact />
+          )}
+        </Route>
 
-          <Route path="/create-playlist">
-            <CreatePlaylist />
-            {!accessToken && (
-              <Redirect to="/" exact />
-            )}
-          </Route>
-        </Switch>
+        <Route path="/" exact>
+          {accessToken && (
+            <Redirect to="/create-playlist" />
+          )}
+          <Login />
+        </Route>
+      </Switch>
     </Router>
   )
 }

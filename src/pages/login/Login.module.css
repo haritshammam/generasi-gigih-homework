@@ -1,13 +1,11 @@
-.app_container {
+/* .app_container {
 	padding: 5rem 3rem 7rem;
-}
-
-.authentication_container {
-  text-align: center;
-}
+} */
 
 .authentication_heading {
+  text-align: center;
   font-size: 2.5rem;
+  font-weight: 700;
   color: #2dafd8;
-  margin-bottom: 4rem;
+  margin-top: 9.375rem;
 }
