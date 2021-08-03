@@ -2,23 +2,19 @@ import React from 'react'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { tokenActions } from '../../redux/slices/token-slice'
 import { createPlaylist, searchTrack } from '../../redux/slices/spotify-slice';
 
 import styles from './CreatePlaylist.module.css'
 
-import Button from '../../components/UI/buttons'
 import InputLarge from '../../components/UI/input-field-large'
 import TrackCard from '../../components/UI/cards'
 import IconButton from '../../components/UI/icon-buttons'
 import NewPlaylistForm from '../../components/UI/forms'
-import UserProfile from '../../components/UI/user-profile'
 
 const CreatePlaylist = () => {
     const dispatch = useDispatch()
     const accessToken = useSelector(state => state.token.token)
     const tracksData = useSelector(state => state.spotify.tracksData)
-    const userData = useSelector(state => state.spotify.userData)
 
     const [searchKeyword, setSearchKeyword] = useState()
     const [selectedTracks, setSelectedTracks] = useState([])
@@ -26,10 +22,6 @@ const CreatePlaylist = () => {
         playlistTitle: '',
         playlistDescription: ''
     })
-
-    const handleLogout = () => {
-        dispatch(tokenActions.emptyToken())
-    }
 
     // To call Spotify Search API
     const handleSearchTracks = () => {
@@ -77,15 +69,6 @@ const CreatePlaylist = () => {
 
     return (
         <div className={styles.app_container}>
-            <div>
-                {userData && (
-                    <div>
-                        <UserProfile userData={userData} />
-                        <Button onClick={handleLogout}>Logout</Button>
-                    </div>
-                )}
-            </div>
-
             <NewPlaylistForm
                 handleSubmitNewPlaylistForm={handleSubmitNewPlaylistForm}
                 handleChangeNewPlaylistInput={handleChangeNewPlaylistInput}
