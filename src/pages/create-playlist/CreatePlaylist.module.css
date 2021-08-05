@@ -11,15 +11,3 @@
 	top: 0.45rem;
 	right: 8.6rem;
 }
-
-.text_small {
-	color: #73808a;
-	margin-top: 3rem;
-}
-
-.track_card_list_container {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 4rem;
-	margin-top: 2rem;
-}

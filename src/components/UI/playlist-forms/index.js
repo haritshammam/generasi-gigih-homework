@@ -1,16 +1,20 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { searchTrack } from '../../../redux/slices/spotify-slice'
+import { createPlaylist, searchTrack } from '../../../redux/slices/spotify-slice'
 
 
 import Button from '../buttons'
 import TrackCard from '../cards'
 import styles from './formStyle.module.css'
 
-const NewPlaylistForm = ({ handleSubmitNewPlaylistForm, handleChangeNewPlaylistInput, newPlaylistForm }) => {
+const NewPlaylistForm = () => {
 
     const [searchKeyword, setSearchKeyword] = useState()
     const [selectedTracks, setSelectedTracks] = useState([])
+    const [newPlaylistForm, setnewPlaylistForm] = useState({
+        playlistTitle: '',
+        playlistDescription: ''
+    })
 
     const dispatch = useDispatch()
     const accessToken = useSelector(state => state.token.token)
@@ -19,6 +23,15 @@ const NewPlaylistForm = ({ handleSubmitNewPlaylistForm, handleChangeNewPlaylistI
     const handleSearchTracks = () => {
         dispatch(searchTrack(accessToken, searchKeyword))
     }
+
+    const handleReset = () => {
+        Array.from(document.querySelectorAll("input")).forEach(
+            input => (input.value = "")
+        );
+        setnewPlaylistForm({});
+        setSearchKeyword()
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    };
 
     // To get select track button state
     const getSelectTrackButtonState = (uri) => {
@@ -45,6 +58,20 @@ const NewPlaylistForm = ({ handleSubmitNewPlaylistForm, handleChangeNewPlaylistI
             }
         }
         setSelectedTracks(currentList);
+    }
+
+
+    // To handle submit new playlist form
+    const handleSubmitNewPlaylistForm = e => {
+        e.preventDefault()
+        dispatch(createPlaylist(newPlaylistForm, accessToken, selectedTracks))
+        handleReset()
+        alert("Playlist Created")
+    }
+
+    // To handle input change of New Playlist form
+    const handleChangeNewPlaylistInput = e => {
+        setnewPlaylistForm({ ...newPlaylistForm, [e.target.name]: e.target.value })
     }
 
     return (
@@ -98,6 +125,7 @@ const NewPlaylistForm = ({ handleSubmitNewPlaylistForm, handleChangeNewPlaylistI
                     </div>
                 </div>
 
+
                 {tracksData && <p className={styles.text_small}>Results</p>}
 
                 <div className={styles.track_card_list_container}>
@@ -116,6 +144,7 @@ const NewPlaylistForm = ({ handleSubmitNewPlaylistForm, handleChangeNewPlaylistI
                 </div>
 
                 <Button type="submit">Create playlist</Button>
+
             </form>
         </div>
     )

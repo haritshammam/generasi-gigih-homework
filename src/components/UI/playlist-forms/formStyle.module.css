@@ -57,6 +57,12 @@
   place-items: center;
 }
 
+.search_song_button:hover {
+  cursor: pointer;
+  background-color: #1c86a8;
+  transition: all 250ms;
+}
+
 ::placeholder {
   color: #73808a;
 }

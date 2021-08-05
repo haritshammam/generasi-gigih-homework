@@ -20,9 +20,9 @@ const TrackCard = ({ buttonState, trackData, pushToSelectedTracks, deleteFromSel
 
     let SelectButton
     if (!isTrackSelected2) {
-        SelectButton = <button className={styles.track_button} onClick={handleSelectTrack}><img src={add} alt="select"/></button>
+        SelectButton = <button type="button" className={styles.track_button} onClick={handleSelectTrack}><img src={add} alt="select"/></button>
     } else {
-        SelectButton = <button className={`${styles.track_button} ${styles.track_button_selected}`} onClick={handleSelectTrack}><img src={done} alt="deselect"/></button>
+        SelectButton = <button type="button" className={`${styles.track_button} ${styles.track_button_selected}`} onClick={handleSelectTrack}><img src={done} alt="deselect"/></button>
     }
 
     return (
