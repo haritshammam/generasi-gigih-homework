@@ -13,14 +13,13 @@
 }
 
 .text_small {
-	text-align: center;
 	color: #73808a;
-	margin-top: 1.25rem;
+	margin-top: 3rem;
 }
 
 .track_card_list_container {
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 4rem;
-	margin-top: 6rem;
+	margin-top: 2rem;
 }

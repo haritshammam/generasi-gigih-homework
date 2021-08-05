@@ -1,0 +1,82 @@
+.form {
+  margin-bottom: 4rem;
+}
+
+.header {
+  font-size: 2rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 2.5rem;
+}
+
+.field_container {
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+.label {
+  display: block;
+  font-size: 1.25rem;
+  color: #b0bbc8;
+  margin-bottom: 1.25rem;
+}
+
+.input {
+  display: block;
+  height: 4rem;
+  width: 100%;
+  border: 0;
+  border-radius: 1.5rem;
+  background-color: #383f45;
+  font-size: 1.25rem;
+  padding-left: 2rem;
+  box-sizing: border-box;
+  color: white;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.input_search_song {
+  position: relative;
+}
+
+.search_song_button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background-color: #2dafd8;
+  border: 0;
+  height: 4rem;
+  width: 6.25rem;
+  border-top-right-radius: 1.5rem;
+  border-bottom-right-radius: 1.5rem;
+  color: white;
+  display: grid;
+  place-items: center;
+}
+
+::placeholder {
+  color: #73808a;
+}
+
+.text_small {
+  color: #73808a;
+  margin-top: 3rem;
+}
+
+.track_card_list_container {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4rem;
+  margin-top: 2rem;
+  margin-bottom: 3rem;
+}
+
+.form > Button {
+  width: 100%;
+  height: 4rem;
+  font-size: 1.25rem;
+  border-radius: 1.5rem;
+}

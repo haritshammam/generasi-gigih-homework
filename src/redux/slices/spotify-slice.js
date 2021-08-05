@@ -103,7 +103,7 @@ export const searchTrack = (accessToken, searchKeyword) => {
                     api_key: process.env.REACT_APP_GIPHY_API_KEY,
                     q: searchKeyword,
                     type: "track",
-                    limit: 12
+                    limit: 9
                 }
             })
             dispatch(spotifyActions.appendTracksData(res.data.tracks.items))
