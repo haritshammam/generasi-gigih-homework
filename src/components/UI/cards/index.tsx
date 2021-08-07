@@ -1,10 +1,35 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import styles from './trackCardStyle.module.css'
 
 import add from './src/add.svg'
 import done from './src/done.svg'
 
-const TrackCard = ({ buttonState, trackData, pushToSelectedTracks, deleteFromSelectedTracks }) => {
+
+interface AlbumProps {
+    images: {
+        url: string
+    }[]    
+}
+
+interface ArtistProps {
+    name: string
+}
+
+interface TrackDataProps {
+    uri: string
+    name: string
+    album: AlbumProps
+    artists: ArtistProps[]
+}
+
+interface TrackCardProps {
+    buttonState: boolean
+    trackData: TrackDataProps
+    pushToSelectedTracks: Function
+    deleteFromSelectedTracks: Function
+}
+
+const TrackCard = ({ buttonState, trackData, pushToSelectedTracks, deleteFromSelectedTracks }: TrackCardProps) => {
 
     const [isTrackSelected2, setTrackSelected] = useState(buttonState)
 
