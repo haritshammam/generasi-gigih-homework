@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createPlaylist, searchTrack, spotifyActions } from '../../../redux/slices/spotify-slice'
+import { createPlaylist, spotifyActions } from '../../../redux/slices/spotify-slice'
+import { searchTrack } from '../../../redux/action-creators/spotify-api/search-track'
 
 
 import Button from '../buttons'
