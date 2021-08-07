@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { createPlaylist, searchTrack } from '../../../redux/slices/spotify-slice'
+import { createPlaylist, searchTrack, spotifyActions } from '../../../redux/slices/spotify-slice'
 
 
 import Button from '../buttons'
@@ -30,6 +30,8 @@ const NewPlaylistForm = () => {
         );
         setnewPlaylistForm({});
         setSearchKeyword()
+        setSelectedTracks([])
+        dispatch(spotifyActions.clearSelectedTracks())
         window.scrollTo({top: 0, behavior: 'smooth'});
     };
 
@@ -126,7 +128,7 @@ const NewPlaylistForm = () => {
                 </div>
 
 
-                {tracksData && <p className={styles.text_small}>Results</p>}
+                {tracksData && <p className={styles.text_small}>Select the song you want to add to the playlist</p>}
 
                 <div className={styles.track_card_list_container}>
                     {tracksData && tracksData.map((track) => {

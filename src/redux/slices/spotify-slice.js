@@ -16,6 +16,9 @@ const spotifySlice = createSlice({
 
         appendUserData(state, action) {
             state.userData = action.payload
+        },
+        clearSelectedTracks(state) {
+            state.tracksData = null
         }
     }
 })
