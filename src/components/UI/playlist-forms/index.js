@@ -5,7 +5,7 @@ import { searchTrack } from '../../../redux/action-creators/spotify-api/search-t
 
 
 import Button from '../buttons'
-import TrackCard from '../cards'
+import TrackCard from '../cards/TrackCard'
 import styles from './formStyle.module.css'
 
 const NewPlaylistForm = () => {
