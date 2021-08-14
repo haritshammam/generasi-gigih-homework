@@ -16,27 +16,26 @@ const trackData = {
     }]
 }
 
+let getByTestId;
+
+beforeEach(() => {
+    const component = render(<TrackCard trackData={trackData}/>)
+    getByTestId = component.getByTestId
+}
+
+)
+
 test('image of track card rendered', () => {
-    const { getByTestId } = render(
-        <TrackCard trackData={trackData} />
-    )
     const imgEl = getByTestId("track-image")
     expect(imgEl).toBeInTheDocument()
 })
 
 test('title name of track card rendered', () => {
-    const { getByTestId } = render(
-        <TrackCard trackData={trackData} />
-    )
     const titleEl = getByTestId("track-title")
     expect(titleEl).toBeInTheDocument()
 })
 
 test('artist name of track card rendered', () => {
-    const { getByTestId } = render(
-        <TrackCard trackData={trackData} />
-    )
     const artistEl = getByTestId("track-artist")
     expect(artistEl).toBeInTheDocument()
 })
-
